@@ -6,14 +6,14 @@ use RMS\PushNotificationsBundle\Device\Types;
 use RMS\PushNotificationsBundle\Exception\InvalidMessageTypeException;
 use RMS\PushNotificationsBundle\Message\MessageInterface;
 
-class AndroidGCMNotification extends BaseAndroidCloudMessagingNotification
+class AndroidFCMNotification extends BaseAndroidCloudMessagingNotification
 {
     /**
      * {@inheritdoc}
      */
     protected function getApiUrl()
     {
-        return 'https://android.googleapis.com/gcm/send';
+        return 'https://fcm.googleapis.com/fcm/send';
     }
 
     /**
@@ -21,8 +21,8 @@ class AndroidGCMNotification extends BaseAndroidCloudMessagingNotification
      */
     protected function validateMessage(MessageInterface $message)
     {
-        if ($message->getTargetOS() != Types::OS_ANDROID_GCM) {
-            throw new InvalidMessageTypeException(sprintf("Message type '%s' not supported by GCM", get_class($message)));
+        if ($message->getTargetOS() != Types::OS_ANDROID_FCM) {
+            throw new InvalidMessageTypeException(sprintf("Message type '%s' not supported by FCM", get_class($message)));
         }
     }
 }

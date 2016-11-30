@@ -1,0 +1,68 @@
+<?php
+
+namespace RMS\PushNotificationsBundle\Service;
+
+use RMS\PushNotificationsBundle\Exception\InvalidMessageTypeException;
+use RMS\PushNotificationsBundle\Message\MessageInterface;
+use RMS\PushNotificationsBundle\Service\OS\OSNotificationServiceInterface;
+use Exception;
+
+final class Notifier implements NotifierInterface
+{
+    /**
+     * @var OSNotificationServiceInterface[]
+     */
+    protected $handlers = [];
+
+    /**
+     * @param OSNotificationServiceInterface[] $handlers
+     */
+    public function __construct(array $handlers = [])
+    {
+        $this->handlers = $handlers;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function send(MessageInterface $message)
+    {
+        $messageSent = false;
+
+        foreach ($this->handlers as $handler) {
+            /* @var OSNotificationServiceInterface $handler */
+            try {
+                $messageSent = $messageSent || $handler->send($message);
+            } catch (InvalidMessageTypeException $e){
+                continue;
+            }
+        }
+
+        if (!$messageSent) {
+            throw new Exception("Could not send push notification for message");
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function sendList(array $messages)
+    {
+        foreach ($messages as $message) {
+            $this->send($message);
+        }
+    }
+
+    /**
+     * @param OSNotificationServiceInterface $handler
+     * @return $this
+     */
+    public function addHandler(OSNotificationServiceInterface $handler)
+    {
+        if (!in_array($handler, $this->handlers)) {
+            $this->handlers[] = $handler;
+        }
+
+        return $this;
+    }
+}

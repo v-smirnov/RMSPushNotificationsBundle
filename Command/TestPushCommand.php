@@ -2,14 +2,19 @@
 
 namespace RMS\PushNotificationsBundle\Command;
 
+use RMS\PushNotificationsBundle\Message\BlackberryMessage;
+use RMS\PushNotificationsBundle\Message\iOSMessage;
+use RMS\PushNotificationsBundle\Message\MacMessage;
+use RMS\PushNotificationsBundle\Message\WindowsphoneMessage;
+use RMSPushNotificationsBundle\Message\Android\C2DMAndroidMessage;
+use RMSPushNotificationsBundle\Message\Android\FCMAndroidMessage;
+use RMSPushNotificationsBundle\Message\Android\GCMAndroidMessage;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-
-use Symfony\Component\Console\Input\InputArgument,
-    Symfony\Component\Console\Input\InputInterface,
-    Symfony\Component\Console\Input\InputOption,
-    Symfony\Component\Console\Output\OutputInterface;
-use RMS\PushNotificationsBundle\Message as PushMessage,
-    RMS\PushNotificationsBundle\Message\MessageInterface;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use RMS\PushNotificationsBundle\Message\MessageInterface;
 
 class TestPushCommand extends ContainerAwareCommand
 {
@@ -30,7 +35,7 @@ class TestPushCommand extends ContainerAwareCommand
             ->setDescription("Sends a push command to a supplied push token'd device")
             ->addOption("badge", "b", InputOption::VALUE_OPTIONAL, "Badge number (for iOS devices)", 0)
             ->addOption("text", "t", InputOption::VALUE_OPTIONAL, "Text message")
-            ->addArgument("service", InputArgument::REQUIRED, "One of 'ios', 'c2dm', 'gcm', 'mac', 'blackberry' or 'windowsphone'")
+            ->addArgument("service", InputArgument::REQUIRED, "One of 'ios', 'c2dm', 'gcm', 'fcm', 'mac', 'blackberry' or 'windowsphone'")
             ->addArgument("token", InputArgument::REQUIRED, "Authentication token for the service")
             ->addArgument("payload", InputArgument::OPTIONAL, "The payload data to send (JSON)", '{"data": "test"}')
         ;
@@ -102,24 +107,29 @@ class TestPushCommand extends ContainerAwareCommand
      */
     protected function getMessageClass($service)
     {
-        switch ($service) {
-            case "ios":
-                return new PushMessage\iOSMessage();
-            case "c2dm":
-                return new PushMessage\AndroidMessage();
-            case "gcm":
-                $message = new PushMessage\AndroidMessage();
-                $message->setGCM(true);
+        $serviceToMessageClassMap =  $this->getServiceToMessageClassMap();
 
-                return $message;
-            case "blackberry":
-                return new PushMessage\BlackberryMessage();
-            case "mac":
-                return new PushMessage\MacMessage();
-            case "windowsphone":
-                return new PushMessage\WindowsphoneMessage();
-            default:
-                throw new \InvalidArgumentException("Service '{$service}' not supported presently");
+        if (!array_key_exists($service, $serviceToMessageClassMap)) {
+            throw new \InvalidArgumentException("Service '{$service}' not supported presently");
         }
+
+        return new $serviceToMessageClassMap[$service];
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getServiceToMessageClassMap()
+    {
+        return
+            [
+                'ios' => 'iOSMessage',
+                'c2dm' => 'C2DMAndroidMessage',
+                'gcm' => 'GCMAndroidMessage',
+                'fcm' => 'FCMAndroidMessage',
+                'blackberry' => 'BlackberryMessage',
+                'mac' => 'MacMessage',
+                'windowsphone' => 'WindowsphoneMessage',
+            ];
     }
 }
