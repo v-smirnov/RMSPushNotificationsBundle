@@ -5,7 +5,7 @@ namespace RMS\PushNotificationsBundle\Service;
 use RMS\PushNotificationsBundle\Exception\InvalidMessageTypeException;
 use RMS\PushNotificationsBundle\Message\MessageInterface;
 use RMS\PushNotificationsBundle\Service\OS\OSNotificationServiceInterface;
-use Exception;
+use RuntimeException;
 
 final class Notifier implements NotifierInterface
 {
@@ -39,7 +39,12 @@ final class Notifier implements NotifierInterface
         }
 
         if (!$messageSent) {
-            throw new Exception("Could not send push notification for message");
+            throw new RuntimeException(
+                sprintf(
+                    "Could not send push notification for message class %s",
+                    get_class($message)
+                )
+            );
         }
     }
 
