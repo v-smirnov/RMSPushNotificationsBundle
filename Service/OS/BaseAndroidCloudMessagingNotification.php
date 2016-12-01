@@ -3,6 +3,7 @@
 namespace RMS\PushNotificationsBundle\Service\OS;
 
 use Psr\Log\LoggerInterface;
+use RMS\PushNotificationsBundle\Device\Types;
 use RMS\PushNotificationsBundle\Exception\InvalidMessageTypeException;
 use RMS\PushNotificationsBundle\Message\MessageInterface;
 use Buzz\Browser;
@@ -152,7 +153,17 @@ abstract class BaseAndroidCloudMessagingNotification implements OSNotificationSe
      * @return void
      * @throws InvalidMessageTypeException
      */
-    abstract protected function validateMessage(MessageInterface $message);
+    protected function validateMessage(MessageInterface $message)
+    {
+        if ($message->getTargetOS() != Types::OS_ANDROID_CM) {
+            throw new InvalidMessageTypeException(
+                sprintf(
+                    "Message type '%s' not supported by android cloud messaging service",
+                    get_class($message)
+                )
+            );
+        }
+    }
 
     /**
      * @return string[]
