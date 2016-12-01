@@ -2,10 +2,10 @@
 
 namespace RMS\PushNotificationsBundle\DependencyInjection;
 
-use Symfony\Component\HttpKernel\DependencyInjection\Extension,
-    Symfony\Component\DependencyInjection\ContainerBuilder,
-    Symfony\Component\DependencyInjection\Loader\XmlFileLoader,
-    Symfony\Component\Config\FileLocator;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\Config\FileLocator;
 
 class RMSPushNotificationsExtension extends Extension
 {
@@ -22,8 +22,8 @@ class RMSPushNotificationsExtension extends Extension
     /**
      * Loads any resources/services we need
      *
-     * @param  array                                                   $configs
-     * @param  \Symfony\Component\DependencyInjection\ContainerBuilder $container
+     * @param array $configs
+     * @param ContainerBuilder $container
      * @return void
      */
     public function load(array $configs, ContainerBuilder $container)
@@ -135,8 +135,8 @@ class RMSPushNotificationsExtension extends Extension
     /**
      * Sets Apple config into container
      *
-     * @param  array             $config
-     * @param $os
+     * @param array $config
+     * @param string $os
      * @throws \RuntimeException
      * @throws \LogicException
      */

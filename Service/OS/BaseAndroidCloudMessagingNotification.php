@@ -89,7 +89,7 @@ abstract class BaseAndroidCloudMessagingNotification implements OSNotificationSe
     {
         $this->validateMessage($message);
 
-        $data = $this->prepareInitialData($message);
+        $data = $this->prepareInitialMessageData($message);
 
         if ($this->isSingleDeviceNotification($message)) {
             $data['to'] = $message->getDeviceIdentifier();
@@ -187,7 +187,7 @@ abstract class BaseAndroidCloudMessagingNotification implements OSNotificationSe
      * @param MessageInterface $message
      * @return mixed[]
      */
-    private function prepareInitialData(MessageInterface $message)
+    private function prepareInitialMessageData(MessageInterface $message)
     {
         return
             $this->useDryRun

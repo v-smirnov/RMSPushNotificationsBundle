@@ -2,13 +2,6 @@
 
 namespace RMS\PushNotificationsBundle\Command;
 
-use RMS\PushNotificationsBundle\Message\BlackberryMessage;
-use RMS\PushNotificationsBundle\Message\iOSMessage;
-use RMS\PushNotificationsBundle\Message\MacMessage;
-use RMS\PushNotificationsBundle\Message\WindowsphoneMessage;
-use RMSPushNotificationsBundle\Message\Android\C2DMAndroidMessage;
-use RMSPushNotificationsBundle\Message\Android\FCMAndroidMessage;
-use RMSPushNotificationsBundle\Message\Android\GCMAndroidMessage;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,11 +11,6 @@ use RMS\PushNotificationsBundle\Message\MessageInterface;
 
 class TestPushCommand extends ContainerAwareCommand
 {
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    protected $em;
-
     /**
      * Configures the console commnad
      *
@@ -70,25 +58,25 @@ class TestPushCommand extends ContainerAwareCommand
             throw new \InvalidArgumentException("Invalid JSON payload " . $json_payload);
         }
 
-        $msg = $this->getMessageClass($service);
+        $message = $this->getEmptyMessage($service);
 
-        if (method_exists($msg, "setAPSBadge")) {
+        if (method_exists($message, "setAPSBadge")) {
             // Set badge on iOS
-            $msg->setAPSBadge((int) $input->getOption("badge"));
+            $message->setAPSBadge((int) $input->getOption("badge"));
         }
-        if (method_exists($msg, "setAPSSound")) {
+        if (method_exists($message, "setAPSSound")) {
             // Set sound on iOS
-            $msg->setAPSSound("default");
+            $message->setAPSSound("default");
         }
 
-        $msg->setDeviceIdentifier($token);
-        $msg->setData($payload);
+        $message->setDeviceIdentifier($token);
+        $message->setData($payload);
 
         if ($input->getOption("text")) {
-            $msg->setMessage($input->getOption("text"));
+            $message->setMessage($input->getOption("text"));
         }
 
-        $result = $this->getContainer()->get("rms_push_notifications")->send($msg);
+        $result = $this->getContainer()->get("rms_push_notifications")->send($message);
         if ($result) {
             $output->writeln("<comment>Send successful</comment>");
         } else {
@@ -101,11 +89,11 @@ class TestPushCommand extends ContainerAwareCommand
     /**
      * Returns a message class based on the supplied os
      *
-     * @param  string                    $service The name of the service to return a message for
+     * @param  string $service The name of the service to return a message for
      * @throws \InvalidArgumentException
      * @return MessageInterface
      */
-    protected function getMessageClass($service)
+    protected function getEmptyMessage($service)
     {
         $serviceToMessageClassMap =  $this->getServiceToMessageClassMap();
 
