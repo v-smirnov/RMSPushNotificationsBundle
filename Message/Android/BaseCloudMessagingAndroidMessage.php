@@ -2,40 +2,15 @@
 
 namespace RMS\PushNotificationsBundle\Message\Android;
 
-use RMS\PushNotificationsBundle\Device\Types;
-
-final class CMAndroidMessage extends BaseAndroidMessage
+abstract class BaseCloudMessagingAndroidMessage extends BaseAndroidMessage
 {
     /**
      * A collection of device identifiers that the message
-     * is intended for.
+     * is intended for. CM use only
      *
      * @var string[]
      */
     protected $devicesIdentifiers = [];
-
-    /**
-     * Additional options to send in the message
-     *
-     * @var array
-     */
-    protected $options = [];
-
-    /**
-     * @param array $options
-     */
-    public function setOptions($options)
-    {
-        $this->options = $options;
-    }
-
-    /**
-     * @return array
-     */
-    public function getOptions()
-    {
-        return $this->options;
-    }
 
     /**
      * @param string[] $devicesIdentifiers
@@ -73,20 +48,6 @@ final class CMAndroidMessage extends BaseAndroidMessage
      */
     public function getMessageBody()
     {
-        $body = ["data" => array_merge(['message' => $this->message], $this->data)];
-
-        return
-            !empty($this->options)
-                ? array_merge($body, $this->options)
-                : $body
-            ;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getTargetOS()
-    {
-        return Types::OS_ANDROID_CM;
+        return ["data" => array_merge(['message' => $this->message], $this->data)];
     }
 }
