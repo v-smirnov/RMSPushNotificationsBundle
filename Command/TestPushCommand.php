@@ -111,13 +111,12 @@ class TestPushCommand extends ContainerAwareCommand
     {
         return
             [
-                'ios' => 'iOSMessage',
-                'c2dm' => 'C2DMAndroidMessage',
-                'gcm' => 'GCMAndroidMessage',
-                'fcm' => 'FCMAndroidMessage',
-                'blackberry' => 'BlackberryMessage',
-                'mac' => 'MacMessage',
-                'windowsphone' => 'WindowsphoneMessage',
+                'ios' => 'RMS\PushNotificationsBundle\Message\iOSMessage',
+                'c2dm' => 'RMS\PushNotificationsBundle\Message\Android\C2DMAndroidMessage',
+                'cm' => 'RMS\PushNotificationsBundle\Message\Android\CMAndroidMessage',
+                'blackberry' => 'RMS\PushNotificationsBundle\Message\BlackberryMessage',
+                'mac' => 'RMS\PushNotificationsBundle\Message\MacMessage',
+                'windowsphone' => 'RMS\PushNotificationsBundle\Message\WindowsphoneMessage',
             ];
     }
 }

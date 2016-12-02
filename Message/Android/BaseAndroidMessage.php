@@ -1,6 +1,6 @@
 <?php
 
-namespace RMSPushNotificationsBundle\Message\Android;
+namespace RMS\PushNotificationsBundle\Message\Android;
 
 use RMS\PushNotificationsBundle\Message\MessageInterface;
 
