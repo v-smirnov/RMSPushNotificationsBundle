@@ -2,7 +2,7 @@
 
 namespace RMS\PushNotificationsBundle\Service;
 
-use RMS\PushNotificationsBundle\Exception\InvalidMessageTypeException;
+use Exception;
 use RMS\PushNotificationsBundle\Message\MessageInterface;
 use RMS\PushNotificationsBundle\Service\OS\OSNotificationServiceInterface;
 use RuntimeException;
@@ -33,7 +33,7 @@ final class Notifier implements NotifierInterface
             /* @var OSNotificationServiceInterface $handler */
             try {
                 $messageSent = $messageSent || $handler->send($message);
-            } catch (InvalidMessageTypeException $e){
+            } catch (Exception $e){
                 continue;
             }
         }
