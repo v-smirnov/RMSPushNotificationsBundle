@@ -69,10 +69,6 @@ class TestPushCommand extends ContainerAwareCommand
             $message->setAPSSound("default");
         }
 
-        if (method_exists($message, "setNotification")) {
-            $message->setNotification(['title' => 'click', 'text' => 'test message', 'click_action' => 'OPEN_APP']);
-        }
-
         $message->setDeviceIdentifier($token);
         $message->setData($payload);
 
@@ -117,8 +113,7 @@ class TestPushCommand extends ContainerAwareCommand
             [
                 'ios' => 'RMS\PushNotificationsBundle\Message\iOSMessage',
                 'c2dm' => 'RMS\PushNotificationsBundle\Message\Android\C2DMAndroidMessage',
-                'gcm' => 'RMS\PushNotificationsBundle\Message\Android\FCMAndroidMessage',
-                'fcm' => 'RMS\PushNotificationsBundle\Message\Android\GCMAndroidMessage',
+                'cm' => 'RMS\PushNotificationsBundle\Message\Android\CMAndroidMessage',
                 'blackberry' => 'RMS\PushNotificationsBundle\Message\BlackberryMessage',
                 'mac' => 'RMS\PushNotificationsBundle\Message\MacMessage',
                 'windowsphone' => 'RMS\PushNotificationsBundle\Message\WindowsphoneMessage',

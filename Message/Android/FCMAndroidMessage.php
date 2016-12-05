@@ -1,6 +1,6 @@
 <?php
 
-namespace RMS\PushNotificationsBundle\Message\Android;
+namespace RMSPushNotificationsBundle\Message\Android;
 
 use RMS\PushNotificationsBundle\Device\Types;
 
