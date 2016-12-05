@@ -12,12 +12,12 @@ final class CMAndroidMessage extends BaseAndroidMessage
      *
      * @var string[]
      */
-    protected $devicesIdentifiers = [];
+    private $devicesIdentifiers = [];
 
     /**
      * @var mixed[]
      */
-    protected $notification = [];
+    private $notification = [];
 
     /**
      * @param mixed[] $notification
