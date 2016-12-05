@@ -72,16 +72,15 @@ class TestPushCommand extends ContainerAwareCommand
         $message->setDeviceIdentifier($token);
         $message->setData($payload);
 
+        if (method_exists($message, "setNotification")) {
+            $message->setNotification(['title' => 'click', 'text' => 'test message', 'click_action' => 'OPEN_APP']);
+        }
+
         if ($input->getOption("text")) {
             $message->setMessage($input->getOption("text"));
         }
 
-        $result = $this->getContainer()->get("rms_push_notifications")->send($message);
-        if ($result) {
-            $output->writeln("<comment>Send successful</comment>");
-        } else {
-            $output->writeln("<error>Send failed</error>");
-        }
+        $this->getContainer()->get("rms_push_notifications")->send($message);
 
         $output->writeln("<comment>done</comment>");
     }

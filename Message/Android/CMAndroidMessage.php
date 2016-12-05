@@ -15,26 +15,24 @@ final class CMAndroidMessage extends BaseAndroidMessage
     protected $devicesIdentifiers = [];
 
     /**
-     * Additional options to send in the message
-     *
-     * @var array
+     * @var mixed[]
      */
-    protected $options = [];
+    protected $notification = [];
 
     /**
-     * @param array $options
+     * @param mixed[] $notification
      */
-    public function setOptions($options)
+    public function setNotification(array $notification)
     {
-        $this->options = $options;
+        $this->notification = $notification;
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
-    public function getOptions()
+    public function getNotification()
     {
-        return $this->options;
+        return $this->notification;
     }
 
     /**
@@ -76,8 +74,8 @@ final class CMAndroidMessage extends BaseAndroidMessage
         $body = ["data" => array_merge(['message' => $this->message], $this->data)];
 
         return
-            !empty($this->options)
-                ? array_merge($body, $this->options)
+            !empty($this->notification)
+                ? array_merge($body, ['notification' => $this->notification])
                 : $body
             ;
     }
