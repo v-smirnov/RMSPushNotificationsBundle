@@ -49,16 +49,6 @@ final class Notifier implements NotifierInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function sendList(array $messages)
-    {
-        foreach ($messages as $message) {
-            $this->send($message);
-        }
-    }
-
-    /**
      * @param OSNotificationServiceInterface $handler
      * @return $this
      */

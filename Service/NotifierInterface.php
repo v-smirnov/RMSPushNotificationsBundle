@@ -11,10 +11,4 @@ interface NotifierInterface
      * @return void
      */
     public function send(MessageInterface $message);
-
-    /**
-     * @param MessageInterface[] $messages
-     * @return void
-     */
-    public function sendList(array $messages);
 }
