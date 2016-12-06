@@ -3,21 +3,14 @@
 namespace RMS\PushNotificationsBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-
-use Symfony\Component\Console\Input\InputArgument,
-    Symfony\Component\Console\Input\InputInterface,
-    Symfony\Component\Console\Input\InputOption,
-    Symfony\Component\Console\Output\OutputInterface;
-use RMS\PushNotificationsBundle\Message as PushMessage,
-    RMS\PushNotificationsBundle\Message\MessageInterface;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use RMS\PushNotificationsBundle\Message\MessageInterface;
 
 class TestPushCommand extends ContainerAwareCommand
 {
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    protected $em;
-
     /**
      * Configures the console commnad
      *
@@ -30,7 +23,7 @@ class TestPushCommand extends ContainerAwareCommand
             ->setDescription("Sends a push command to a supplied push token'd device")
             ->addOption("badge", "b", InputOption::VALUE_OPTIONAL, "Badge number (for iOS devices)", 0)
             ->addOption("text", "t", InputOption::VALUE_OPTIONAL, "Text message")
-            ->addArgument("service", InputArgument::REQUIRED, "One of 'ios', 'c2dm', 'gcm', 'mac', 'blackberry' or 'windowsphone'")
+            ->addArgument("service", InputArgument::REQUIRED, "One of 'ios', 'c2dm', 'gcm', 'fcm', 'mac', 'blackberry' or 'windowsphone'")
             ->addArgument("token", InputArgument::REQUIRED, "Authentication token for the service")
             ->addArgument("payload", InputArgument::OPTIONAL, "The payload data to send (JSON)", '{"data": "test"}')
         ;
@@ -65,30 +58,29 @@ class TestPushCommand extends ContainerAwareCommand
             throw new \InvalidArgumentException("Invalid JSON payload " . $json_payload);
         }
 
-        $msg = $this->getMessageClass($service);
+        $message = $this->getEmptyMessage($service);
 
-        if (method_exists($msg, "setAPSBadge")) {
+        if (method_exists($message, "setAPSBadge")) {
             // Set badge on iOS
-            $msg->setAPSBadge((int) $input->getOption("badge"));
+            $message->setAPSBadge((int) $input->getOption("badge"));
         }
-        if (method_exists($msg, "setAPSSound")) {
+        if (method_exists($message, "setAPSSound")) {
             // Set sound on iOS
-            $msg->setAPSSound("default");
+            $message->setAPSSound("default");
         }
 
-        $msg->setDeviceIdentifier($token);
-        $msg->setData($payload);
+        $message->setDeviceIdentifier($token);
+        $message->setData($payload);
+
+        if (method_exists($message, "setNotification")) {
+            $message->setNotification(['title' => 'click', 'text' => 'test message', 'click_action' => 'OPEN_APP']);
+        }
 
         if ($input->getOption("text")) {
-            $msg->setMessage($input->getOption("text"));
+            $message->setMessage($input->getOption("text"));
         }
 
-        $result = $this->getContainer()->get("rms_push_notifications")->send($msg);
-        if ($result) {
-            $output->writeln("<comment>Send successful</comment>");
-        } else {
-            $output->writeln("<error>Send failed</error>");
-        }
+        $this->getContainer()->get("rms_push_notifications")->send($message);
 
         $output->writeln("<comment>done</comment>");
     }
@@ -96,30 +88,34 @@ class TestPushCommand extends ContainerAwareCommand
     /**
      * Returns a message class based on the supplied os
      *
-     * @param  string                    $service The name of the service to return a message for
+     * @param  string $service The name of the service to return a message for
      * @throws \InvalidArgumentException
      * @return MessageInterface
      */
-    protected function getMessageClass($service)
+    protected function getEmptyMessage($service)
     {
-        switch ($service) {
-            case "ios":
-                return new PushMessage\iOSMessage();
-            case "c2dm":
-                return new PushMessage\AndroidMessage();
-            case "gcm":
-                $message = new PushMessage\AndroidMessage();
-                $message->setGCM(true);
+        $serviceToMessageClassMap =  $this->getServiceToMessageClassMap();
 
-                return $message;
-            case "blackberry":
-                return new PushMessage\BlackberryMessage();
-            case "mac":
-                return new PushMessage\MacMessage();
-            case "windowsphone":
-                return new PushMessage\WindowsphoneMessage();
-            default:
-                throw new \InvalidArgumentException("Service '{$service}' not supported presently");
+        if (!array_key_exists($service, $serviceToMessageClassMap)) {
+            throw new \InvalidArgumentException("Service '{$service}' not supported presently");
         }
+
+        return new $serviceToMessageClassMap[$service];
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getServiceToMessageClassMap()
+    {
+        return
+            [
+                'ios' => 'RMS\PushNotificationsBundle\Message\iOSMessage',
+                'c2dm' => 'RMS\PushNotificationsBundle\Message\Android\C2DMAndroidMessage',
+                'cm' => 'RMS\PushNotificationsBundle\Message\Android\CMAndroidMessage',
+                'blackberry' => 'RMS\PushNotificationsBundle\Message\BlackberryMessage',
+                'mac' => 'RMS\PushNotificationsBundle\Message\MacMessage',
+                'windowsphone' => 'RMS\PushNotificationsBundle\Message\WindowsphoneMessage',
+            ];
     }
 }

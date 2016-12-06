@@ -2,9 +2,9 @@
 
 namespace RMS\PushNotificationsBundle\Service\OS;
 
-use RMS\PushNotificationsBundle\Exception\InvalidMessageTypeException,
-    RMS\PushNotificationsBundle\Message\AndroidMessage,
-    RMS\PushNotificationsBundle\Message\MessageInterface;
+use RMS\PushNotificationsBundle\Device\Types;
+use RMS\PushNotificationsBundle\Exception\InvalidMessageTypeException;
+use RMS\PushNotificationsBundle\Message\MessageInterface;
 use Buzz\Browser;
 
 class AndroidNotification implements OSNotificationServiceInterface
@@ -72,7 +72,7 @@ class AndroidNotification implements OSNotificationServiceInterface
      */
     public function send(MessageInterface $message)
     {
-        if (!$message instanceof AndroidMessage) {
+        if ($message->getTargetOS() != Types::OS_ANDROID_C2DM) {
             throw new InvalidMessageTypeException(sprintf("Message type '%s' not supported by C2DM", get_class($message)));
         }
 

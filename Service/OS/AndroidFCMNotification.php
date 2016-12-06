@@ -2,13 +2,13 @@
 
 namespace RMS\PushNotificationsBundle\Service\OS;
 
-class AndroidGCMNotification extends BaseAndroidCloudMessagingNotification
+class AndroidFCMNotification extends BaseAndroidCloudMessagingNotification
 {
     /**
      * {@inheritdoc}
      */
     protected function getApiUrl()
     {
-        return 'https://android.googleapis.com/gcm/send';
+        return 'https://fcm.googleapis.com/fcm/send';
     }
 }
